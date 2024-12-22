@@ -3,8 +3,8 @@ import { configureStore, ReducersMapObject } from '@reduxjs/toolkit'
 import { todoReducer } from '@/entities/Todo'
 import { userReducer } from '@/entities/User'
 import { authMiddleware, regReducer } from '@/features/AuthorizationForm'
-import { todoListReducer } from '@/features/UserTodoList'
 import { $api } from '@/shared/api/api'
+import { rtkApi } from '@/shared/api/rtkApi'
 
 import { StateSchema, ThunkExtraArg } from './StateSchema'
 
@@ -13,7 +13,7 @@ export function createReduxStore(initialState?: StateSchema) {
         user: userReducer,
         authForm: regReducer,
         todo: todoReducer,
-        todosList: todoListReducer,
+        [rtkApi.reducerPath]: rtkApi.reducer,
     }
 
     const extraArg: ThunkExtraArg = {
@@ -29,7 +29,9 @@ export function createReduxStore(initialState?: StateSchema) {
                 thunk: {
                     extraArgument: extraArg,
                 },
-            }).concat(authMiddleware),
+            })
+                .concat(rtkApi.middleware)
+                .concat(authMiddleware),
     })
 
     return store

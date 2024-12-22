@@ -1,36 +1,19 @@
 import { createSelector } from '@reduxjs/toolkit'
 
-import { StateSchema } from '@/app/providers/StoreProvider'
+import { userTodoListApi } from '../api/userTodoListApi'
 
-import { todosAdapter } from '../slice/todoListSlice'
-import { TodoListSchema } from '../types/todoListSchema'
-
-const selectUserTodosState = (state: StateSchema) =>
-    state.todosList || todosAdapter.getInitialState()
+const selectUserTodosState = userTodoListApi.endpoints.getUserTodoList.select(
+    {},
+)
 
 export const getTodosList = createSelector(
-    [selectUserTodosState],
-    (todosState: TodoListSchema) =>
-        todosAdapter.getSelectors().selectAll(todosState),
+    selectUserTodosState,
+    (todosResult) => todosResult?.data || [],
 )
 
-export const getTodoListIsLoading = createSelector(
-    [selectUserTodosState],
-    (todosState: TodoListSchema) => todosState.isLoading,
+export const getTodoListCompleted = createSelector(getTodosList, (todos) =>
+    todos.filter((todo) => todo.completed === true),
 )
-export const getTodoListCompleted = createSelector(
-    [selectUserTodosState],
-    (todosState: TodoListSchema) =>
-        todosAdapter
-            .getSelectors()
-            .selectAll(todosState)
-            .filter((todo) => todo.completed === true),
-)
-export const getTodoListActive = createSelector(
-    [selectUserTodosState],
-    (todosState: TodoListSchema) =>
-        todosAdapter
-            .getSelectors()
-            .selectAll(todosState)
-            .filter((todo) => todo.completed === false),
+export const getTodoListActive = createSelector(getTodosList, (todos) =>
+    todos.filter((todo) => todo.completed === false),
 )

@@ -14,22 +14,15 @@ interface TodoItemProps {
     todo: MyTodo
     isLoading?: boolean
     updateTodoServer: (id: string, value?: string, completed?: boolean) => void
-    updateTodoAction: (id: string, value?: string, completed?: boolean) => void
     deleteTodoHandler: (todo: MyTodo) => void
 }
 
 export const TodoItem = memo((props: TodoItemProps) => {
-    const {
-        className,
-        todo,
-        updateTodoServer,
-        updateTodoAction,
-        isLoading,
-        deleteTodoHandler,
-    } = props
+    const { className, todo, updateTodoServer, isLoading, deleteTodoHandler } =
+        props
 
-    const [initValue, setInitValue] = useState(todo.value)
-    const [inputValue, setInputValue] = useState(todo.value)
+    const [initValue, setInitValue] = useState(todo.value || '')
+    const [inputValue, setInputValue] = useState(todo.value || '')
     const [isAuthModal, setIsAuthModal] = useState(false)
 
     const onCloseModal = useCallback(() => {
@@ -42,9 +35,8 @@ export const TodoItem = memo((props: TodoItemProps) => {
     const onChangeText = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             setInputValue(e.target.value)
-            updateTodoAction(todo._id, e.target.value)
         },
-        [updateTodoAction, todo._id],
+        [],
     )
 
     const handleBlur = useCallback(() => {
@@ -55,15 +47,8 @@ export const TodoItem = memo((props: TodoItemProps) => {
     }, [initValue, inputValue, todo._id, updateTodoServer])
 
     const handleCompleted = useCallback(() => {
-        updateTodoAction(todo._id, todo.value, !todo.completed)
         updateTodoServer(todo._id, todo.value, !todo.completed)
-    }, [
-        todo._id,
-        todo.completed,
-        todo.value,
-        updateTodoAction,
-        updateTodoServer,
-    ])
+    }, [todo._id, todo.completed, todo.value, updateTodoServer])
 
     const onClickDelete = useCallback(() => {
         deleteTodoHandler(todo)
@@ -91,7 +76,7 @@ export const TodoItem = memo((props: TodoItemProps) => {
                         onClick={onShowModal}
                     />
                     <Input
-                        value={todo.value}
+                        value={inputValue}
                         onChange={onChangeText}
                         onBlur={handleBlur}
                         size="large"

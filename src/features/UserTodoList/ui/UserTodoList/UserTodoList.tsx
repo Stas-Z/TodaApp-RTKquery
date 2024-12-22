@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 import { Empty, Switch } from 'antd'
 import { useSelector } from 'react-redux'
@@ -9,15 +9,14 @@ import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch/useAppDispatch
 
 import cls from './UserTodoList.module.scss'
 import {
+    useDeleteUserTodo,
+    useGetUserTodoList,
+    useUpdateUserTodo,
+} from '../../model/api/userTodoListApi'
+import {
     getTodoListActive,
     getTodoListCompleted,
-    getTodoListIsLoading,
-    getTodosList,
 } from '../../model/selectors/getTodosSelector'
-import { deleteTodo } from '../../model/services/deleteTodo/deleteTodo'
-import { fetchTodoList } from '../../model/services/fetchTodoList/fetchTodoList'
-import { updateTodo } from '../../model/services/updateTodo/updateTodo'
-import { todoListActions } from '../../model/slice/todoListSlice'
 
 interface UserTodoListProps {
     className?: string
@@ -32,56 +31,26 @@ export const UserTodoList = memo((props: UserTodoListProps) => {
         setIsActive((prev) => !prev)
     }, [])
 
+    const { isLoading, data: todos } = useGetUserTodoList({})
+    const [deleteTodo] = useDeleteUserTodo()
+    const [updateTodo] = useUpdateUserTodo()
+
     const dispatch = useAppDispatch()
 
-    const todos = useSelector(getTodosList)
     const todosCompleted = useSelector(getTodoListCompleted)
     const todosActive = useSelector(getTodoListActive)
-    const isLoading = useSelector(getTodoListIsLoading)
-
-    useEffect(() => {
-        if (!todos.length) {
-            dispatch(fetchTodoList({}))
-        }
-        // eslint-disable-next-line
-    }, [dispatch])
-
-    const updateTodoAction = (
-        id: string,
-        value?: string,
-        completed?: boolean,
-    ) => {
-        dispatch(
-            todoListActions.updateTodo({
-                id,
-                changes: { value, completed },
-            }),
-        )
-    }
 
     const updateTodoServer = useCallback(
         (id: string, value?: string, completed?: boolean) => {
-            dispatch(updateTodo({ id, value, completed }))
+            updateTodo({ id, value, completed })
         },
-        [dispatch],
+        [updateTodo],
     )
     const deleteTodoHandler = useCallback(
         async (todo: MyTodo) => {
-            const backUpTodo = { ...todo }
-
-            dispatch(todoListActions.deleteTodo(todo._id))
-
-            try {
-                const id = todo._id
-                await dispatch(deleteTodo({ id })).unwrap()
-            } catch (e) {
-                if (backUpTodo) {
-                    dispatch(todoListActions.setTodo(backUpTodo))
-                }
-                console.error('Failed to update todo:', e)
-            }
+            deleteTodo({ id: todo._id })
         },
-        [dispatch],
+        [deleteTodo],
     )
     const getSortedTodos = () => {
         if (completed) return todosCompleted
@@ -97,7 +66,7 @@ export const UserTodoList = memo((props: UserTodoListProps) => {
     )
 
     const isEmpty =
-        (!sortTodos.length && !todos.length) ||
+        (!sortTodos?.length && !todos?.length) ||
         (completed && !todosCompleted.length)
 
     if (isEmpty) {
@@ -116,10 +85,9 @@ export const UserTodoList = memo((props: UserTodoListProps) => {
         <div className={classNames(cls.userTodoList, {}, [className])}>
             {!completed && switchTodo}
             <TodoList
-                todos={sortTodos}
+                todos={sortTodos || []}
                 isLoading={isLoading}
                 updateTodoServer={updateTodoServer}
-                updateTodoAction={updateTodoAction}
                 deleteTodoHandler={deleteTodoHandler}
             />
         </div>

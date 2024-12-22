@@ -1,7 +1,7 @@
 export interface MyTodo {
     _id: string
-    value: string
-    userId: string
+    value?: string
+    userId?: string
     createdAt?: string
     completed?: boolean
 }

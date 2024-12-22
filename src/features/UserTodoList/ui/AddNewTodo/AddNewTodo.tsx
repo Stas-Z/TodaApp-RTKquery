@@ -2,10 +2,9 @@ import { memo, useCallback } from 'react'
 
 import { TodoBlank } from '@/entities/Todo'
 import { classNames } from '@/shared/lib/classNames/classNames'
-import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch/useAppDispatch'
 
 import cls from './AddNewTodo.module.scss'
-import { addNewTodo } from '../../model/services/addNewTodo/addNewTodo'
+import { useAddNewUserTodo } from '../../model/api/userTodoListApi'
 
 interface AddNewTodoProps {
     className?: string
@@ -13,13 +12,14 @@ interface AddNewTodoProps {
 
 export const AddNewTodo = memo((props: AddNewTodoProps) => {
     const { className } = props
-    const dispatch = useAppDispatch()
+
+    const [addNewTodo] = useAddNewUserTodo()
 
     const onAddTodo = useCallback(
         (value: string) => {
-            dispatch(addNewTodo(value))
+            addNewTodo({ value })
         },
-        [dispatch],
+        [addNewTodo],
     )
 
     return (

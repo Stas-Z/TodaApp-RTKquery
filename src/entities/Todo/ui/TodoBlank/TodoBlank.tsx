@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux'
 import { classNames } from '@/shared/lib/classNames/classNames'
 import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch/useAppDispatch'
 
+import cls from './TodoBlank.module.scss'
 import { getTodoValue } from '../../model/selectors/getTodoSelectors'
 import { todoActions } from '../../model/slice/todoSlice'
 
@@ -33,7 +34,7 @@ export const TodoBlank = memo((props: TodoBlankProps) => {
     }
 
     const onAddHandler = useCallback(() => {
-        onAddTodo(value)
+        onAddTodo(value || '')
         onChangeText('')
     }, [onAddTodo, onChangeText, value])
 
@@ -53,7 +54,7 @@ export const TodoBlank = memo((props: TodoBlankProps) => {
     }, [onKeyDown])
 
     return (
-        <div className={classNames('', {}, [className])}>
+        <div className={classNames(cls.todoBlank, {}, [className])}>
             <Card hoverable>
                 <Space.Compact direction="horizontal" block>
                     <Input
