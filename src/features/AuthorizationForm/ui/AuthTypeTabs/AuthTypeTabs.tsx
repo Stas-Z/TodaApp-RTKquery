@@ -29,8 +29,6 @@ export const AuthTypeTabs = memo((props: AuthTypeTabsProps) => {
 
     const onTabClick = useCallback(
         (tab: string) => {
-            console.log(tab)
-
             onChangeType(tab as AuthType)
         },
         [onChangeType],

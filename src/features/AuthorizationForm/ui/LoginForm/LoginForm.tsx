@@ -1,4 +1,11 @@
-import { MutableRefObject, memo, useCallback, useEffect, useRef } from 'react'
+import {
+    MutableRefObject,
+    RefObject,
+    memo,
+    useCallback,
+    useEffect,
+    useRef,
+} from 'react'
 
 import { Button, Input, Space, Typography } from 'antd'
 import { useSelector } from 'react-redux'
@@ -7,10 +14,13 @@ import { classNames } from '@/shared/lib/classNames/classNames'
 import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch/useAppDispatch'
 
 import cls from './LoginForm.module.scss'
+import { useAuthByMail, useRegByMail } from '../../model/api/userAuthApi'
 import { AuthType } from '../../model/consts/authConsts'
-import { getLoginState } from '../../model/selectors/getLoginState/getLoginState'
-import { authByEmail } from '../../model/services/authByEmail/authByEmail'
-import { regByEmail } from '../../model/services/regByEmail/regByEmail'
+import {
+    getAuthView,
+    getEmail,
+    getPassword,
+} from '../../model/selectors/getLoginState/getLoginState'
 import { regActions } from '../../model/slice/regSlice'
 import { AuthTypeTabs } from '../AuthTypeTabs/AuthTypeTabs'
 
@@ -26,10 +36,16 @@ const LoginForm = (props: LoginFormProps) => {
 
     const dispatch = useAppDispatch()
 
-    const { email, password, isLoading, error, succes, view } =
-        useSelector(getLoginState)
+    const password = useSelector(getPassword)
+    const email = useSelector(getEmail)
+    const view = useSelector(getAuthView)
 
-    const timerRef = useRef() as MutableRefObject<ReturnType<typeof setTimeout>>
+    const [login, { isLoading }] = useAuthByMail()
+    const [registration, { error, data }] = useRegByMail()
+
+    const timerRef = useRef<NodeJS.Timeout | null>(null) as MutableRefObject<
+        ReturnType<typeof setTimeout>
+    >
 
     const onChangeEmail = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,21 +61,30 @@ const LoginForm = (props: LoginFormProps) => {
         [dispatch],
     )
 
+    const loginHandler = useCallback(async () => {
+        await login({ email, password }).unwrap()
+        onSuccess?.()
+    }, [email, login, onSuccess, password])
+
     const onButtonClickHandler = useCallback(async () => {
         if (view === AuthType.REG) {
-            const result = await dispatch(regByEmail({ password, email }))
-            if (result.meta.requestStatus === 'fulfilled') {
+            try {
+                await registration({ email, password }).unwrap()
                 timerRef.current = setTimeout(() => {
-                    dispatch(authByEmail({ password, email }))
-                    onSuccess?.()
+                    loginHandler()
                 }, 1000)
+            } catch (error) {
+                console.log(error)
             }
         }
         if (view === AuthType.AUTH) {
-            await dispatch(authByEmail({ password, email }))
-            onSuccess?.()
+            try {
+                loginHandler()
+            } catch (error) {
+                console.log(error)
+            }
         }
-    }, [view, dispatch, password, email, onSuccess])
+    }, [email, loginHandler, password, registration, view])
 
     const onChangeHandler = (view: AuthType) => {
         dispatch(regActions.setView(view))
@@ -81,8 +106,14 @@ const LoginForm = (props: LoginFormProps) => {
         }
     }, [onKeyDown])
 
-    const errorMessage = <Text type="danger">{error}</Text>
-    const succesMessage = <Text type="success">{succes}</Text>
+    const errorMessage = (
+        <Text type="danger">
+            {error &&
+                'data' in error &&
+                (error.data as { message?: string }).message}
+        </Text>
+    )
+    const succesMessage = <Text type="success">{data?.message}</Text>
     const buttonText = view === AuthType.AUTH ? 'Войти' : 'Зарегистрировать'
     const messageServer = (
         <Text type="warning">
@@ -96,7 +127,7 @@ const LoginForm = (props: LoginFormProps) => {
             <AuthTypeTabs value={view} onChangeType={onChangeHandler} />
             <Space direction="vertical" size="large">
                 {error && errorMessage}
-                {succes && succesMessage}
+                {data && succesMessage}
                 <Input
                     autoFocus
                     type="text"

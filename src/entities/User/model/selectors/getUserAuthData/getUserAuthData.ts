@@ -1,5 +1,15 @@
+import { createSelector } from '@reduxjs/toolkit'
+
 import { StateSchema } from '@/app/providers/StoreProvider'
 
-export const getUserAuthData = (state: StateSchema) => state.user.isAuth
+export const getUserData = (state: StateSchema) => state.user
 
-export const getUserData = (state: StateSchema) => state.user.currentUser
+export const getUserAuthData = createSelector(
+    getUserData,
+    (user) => user.isAuth,
+)
+
+export const getCurrentUser = createSelector(
+    getUserData,
+    (user) => user.currentUser,
+)
