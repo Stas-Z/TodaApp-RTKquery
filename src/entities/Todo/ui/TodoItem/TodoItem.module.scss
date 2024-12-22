@@ -1,0 +1,32 @@
+.card {
+	background: aliceblue;
+}
+
+.completedCard::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 4%;
+	right: 0;
+	height: 1px;
+	background-color: gray;
+	z-index: 1;
+	width: 92%;
+}
+
+.completed {
+	filter: grayscale(100%);
+	text-decoration: line-through;
+}
+
+.buttonBlue {
+	color: #08f;
+}
+
+.date {
+	color: grey;
+	font-size: 12px;
+	position: absolute;
+	right: 24px;
+	top: 3px;
+}
