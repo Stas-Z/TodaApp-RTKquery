@@ -5,6 +5,7 @@ import {
     useCallback,
     useEffect,
     useRef,
+    useState,
 } from 'react'
 
 import { Button, Input, Space, Typography } from 'antd'
@@ -40,8 +41,8 @@ const LoginForm = (props: LoginFormProps) => {
     const email = useSelector(getEmail)
     const view = useSelector(getAuthView)
 
-    const [login, { isLoading }] = useAuthByMail()
-    const [registration, { error, data }] = useRegByMail()
+    const [login, { isLoading, error: errorAuth }] = useAuthByMail()
+    const [registration, { error: errorReg, data }] = useRegByMail()
 
     const timerRef = useRef<NodeJS.Timeout | null>(null) as MutableRefObject<
         ReturnType<typeof setTimeout>
@@ -62,8 +63,12 @@ const LoginForm = (props: LoginFormProps) => {
     )
 
     const loginHandler = useCallback(async () => {
-        await login({ email, password }).unwrap()
-        onSuccess?.()
+        try {
+            await login({ email, password }).unwrap()
+            onSuccess?.()
+        } catch (error) {
+            console.log(error)
+        }
     }, [email, login, onSuccess, password])
 
     const onButtonClickHandler = useCallback(async () => {
@@ -78,11 +83,7 @@ const LoginForm = (props: LoginFormProps) => {
             }
         }
         if (view === AuthType.AUTH) {
-            try {
-                loginHandler()
-            } catch (error) {
-                console.log(error)
-            }
+            loginHandler()
         }
     }, [email, loginHandler, password, registration, view])
 
@@ -106,13 +107,22 @@ const LoginForm = (props: LoginFormProps) => {
         }
     }, [onKeyDown])
 
-    const errorMessage = (
-        <Text type="danger">
-            {error &&
-                'data' in error &&
-                (error.data as { message?: string }).message}
-        </Text>
-    )
+    function getError() {
+        if (errorAuth && 'data' in errorAuth) {
+            return (errorAuth.data as { message?: string }).message
+        }
+        if (errorReg && 'data' in errorReg) {
+            return (errorReg.data as { message?: string }).message
+        }
+        if (
+            (errorAuth && 'status' in errorAuth) ||
+            (errorReg && 'status' in errorReg)
+        ) {
+            return 'Нет связи с сервером'
+        }
+    }
+
+    const errorMessageText = <Text type="danger">{getError()}</Text>
     const succesMessage = <Text type="success">{data?.message}</Text>
     const buttonText = view === AuthType.AUTH ? 'Войти' : 'Зарегистрировать'
     const messageServer = (
@@ -126,7 +136,7 @@ const LoginForm = (props: LoginFormProps) => {
         <div className={classNames(cls.loginForm, {}, [className])}>
             <AuthTypeTabs value={view} onChangeType={onChangeHandler} />
             <Space direction="vertical" size="large">
-                {error && errorMessage}
+                {errorMessageText}
                 {data && succesMessage}
                 <Input
                     autoFocus

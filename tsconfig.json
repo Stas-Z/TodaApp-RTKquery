@@ -7,12 +7,13 @@
         "jsx": "react-jsx",
         "allowJs": true,
         "strict": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "baseUrl": ".",
         "paths": { "@/*": ["./src/*"] },
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "isolatedModules": true
+        "isolatedModules": true,
+        "skipLibCheck": true
     },
     "ts-node": {
         "compilerOptions": {

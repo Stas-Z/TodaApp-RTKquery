@@ -1,5 +1,3 @@
-import { AxiosInstance } from 'axios'
-
 import { MyTodoSchema } from '@/entities/Todo'
 import { UserSchema } from '@/entities/User'
 import { AuthSchema } from '@/features/AuthorizationForm'
@@ -14,14 +12,5 @@ export interface StateSchema {
     [rtkApi.reducerPath]: ReturnType<typeof rtkApi.reducer>
 }
 
-export interface ThunkExtraArg {
-    api: AxiosInstance
-}
-
-export interface ThunkConfig<T> {
-    rejectValue: T
-    extra: ThunkExtraArg
-    state: StateSchema
-}
-
+export type RootState = ReturnType<typeof createReduxStore>['getState']
 export type AppDispatch = ReturnType<typeof createReduxStore>['dispatch']

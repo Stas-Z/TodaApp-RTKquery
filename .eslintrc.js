@@ -3,7 +3,12 @@ module.exports = {
         browser: true,
         es2021: true,
     },
-    extends: ['plugin:react/recommended', 'airbnb', 'prettier'],
+    extends: [
+        'plugin:react/recommended',
+        'airbnb',
+        'prettier',
+        'plugin:import/recommended',
+    ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaFeatures: {
@@ -18,9 +23,11 @@ module.exports = {
         'react-hooks',
         'fsd-pathcheker',
         'unused-imports',
+        'import',
         'jsx-a11y',
     ],
     rules: {
+        'import/no-cycle': [2, { maxDepth: 1 }],
         'react/prop-types': 'off',
         'arrow-body-style': 'off',
         'react/jsx-max-props-per-line': ['error', { maximum: 4 }],
