@@ -1,4 +1,5 @@
-import { BuildEnvironmentOptions, ResolvedBuildEnvironmentOptions } from 'vite'
+import { BuildEnvironmentOptions } from 'vite'
+
 import { BuildOptions } from './types/config'
 
 export function buildOptions(options: BuildOptions): BuildEnvironmentOptions {

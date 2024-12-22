@@ -10,7 +10,7 @@ import { getRouteTodo } from '@/shared/const/router'
 interface LoginPageProps {
     className?: string
 }
-const { Title, Text, Paragraph } = Typography
+const { Title, Paragraph } = Typography
 
 const LoginPage = (props: LoginPageProps) => {
     const { className } = props

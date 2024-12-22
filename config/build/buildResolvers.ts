@@ -6,7 +6,7 @@ export function buildResolvers(options: BuildOptions): ResolveOptions & {
     alias?: AliasOptions
 } {
     return {
-        alias: [{ find: '@', replacement: '/src' }],
+        alias: [{ find: '@', replacement: options.paths.src }],
         extensions: ['.tsx', '.ts', '.js'],
     }
 }

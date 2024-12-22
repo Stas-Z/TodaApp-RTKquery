@@ -5,5 +5,7 @@
 .vscode
 .fttemplates
 
+/stats.html
+
 # dependencies
 node_modules

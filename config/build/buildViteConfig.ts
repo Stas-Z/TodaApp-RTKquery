@@ -1,10 +1,10 @@
 import { UserConfig } from 'vite'
 
+import { buildOptions } from './buildOptions'
 import { buildPlugins } from './buildPlugins'
 import { buildResolvers } from './buildResolvers'
 import { buildServer } from './buildServer'
 import { BuildOptions } from './types/config'
-import { buildOptions } from './buildOptions'
 
 export function buildViteConfig(options: BuildOptions): UserConfig {
     const { mode, isDev } = options

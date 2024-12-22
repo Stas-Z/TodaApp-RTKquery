@@ -2,6 +2,8 @@ import { ReactNode, memo, useCallback, useMemo } from 'react'
 
 import { Tabs } from 'antd'
 
+import { classNames } from '@/shared/lib/classNames/classNames'
+
 import { AuthType } from '../../model/consts/authConsts'
 
 export interface TabItem {
@@ -11,12 +13,11 @@ export interface TabItem {
 
 interface AuthTypeTabsProps {
     className?: string
-    value: AuthType
     onChangeType: (type: AuthType) => void
 }
 
 export const AuthTypeTabs = memo((props: AuthTypeTabsProps) => {
-    const { className, onChangeType, value } = props
+    const { className, onChangeType } = props
 
     const typeTabs: TabItem[] = useMemo(
         () =>
@@ -36,6 +37,7 @@ export const AuthTypeTabs = memo((props: AuthTypeTabsProps) => {
 
     return (
         <Tabs
+            className={classNames('', {}, [className])}
             defaultActiveKey="1"
             type="card"
             size="middle"

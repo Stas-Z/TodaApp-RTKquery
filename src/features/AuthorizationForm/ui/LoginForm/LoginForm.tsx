@@ -1,12 +1,4 @@
-import {
-    MutableRefObject,
-    RefObject,
-    memo,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from 'react'
+import { MutableRefObject, memo, useCallback, useEffect, useRef } from 'react'
 
 import { Button, Input, Space, Typography } from 'antd'
 import { useSelector } from 'react-redux'
@@ -108,18 +100,16 @@ const LoginForm = (props: LoginFormProps) => {
     }, [onKeyDown])
 
     function getError() {
-        if (errorAuth && 'data' in errorAuth) {
-            return (errorAuth.data as { message?: string }).message
+        const error = errorAuth || errorReg
+        if (error) {
+            if ('data' in error) {
+                return (error.data as { message?: string }).message || ''
+            }
+            if ('status' in error) {
+                return 'Нет связи с сервером'
+            }
         }
-        if (errorReg && 'data' in errorReg) {
-            return (errorReg.data as { message?: string }).message
-        }
-        if (
-            (errorAuth && 'status' in errorAuth) ||
-            (errorReg && 'status' in errorReg)
-        ) {
-            return 'Нет связи с сервером'
-        }
+        return ''
     }
 
     const errorMessageText = <Text type="danger">{getError()}</Text>
@@ -134,7 +124,7 @@ const LoginForm = (props: LoginFormProps) => {
 
     return (
         <div className={classNames(cls.loginForm, {}, [className])}>
-            <AuthTypeTabs value={view} onChangeType={onChangeHandler} />
+            <AuthTypeTabs onChangeType={onChangeHandler} />
             <Space direction="vertical" size="large">
                 {errorMessageText}
                 {data && succesMessage}

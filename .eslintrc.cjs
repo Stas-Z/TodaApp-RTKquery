@@ -27,6 +27,7 @@ module.exports = {
         'jsx-a11y',
     ],
     rules: {
+        'consistent-return': 'warn',
         'import/no-cycle': [2, { maxDepth: 1 }],
         'react/prop-types': 'off',
         'arrow-body-style': 'off',

@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 
 import { MyTodo, TodoList } from '@/entities/Todo'
 import { classNames } from '@/shared/lib/classNames/classNames'
-import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch/useAppDispatch'
 
 import cls from './UserTodoList.module.scss'
 import {
@@ -34,8 +33,6 @@ export const UserTodoList = memo((props: UserTodoListProps) => {
     const { isLoading, data: todos } = useGetUserTodoList({})
     const [deleteTodo] = useDeleteUserTodo()
     const [updateTodo] = useUpdateUserTodo()
-
-    const dispatch = useAppDispatch()
 
     const todosCompleted = useSelector(getTodoListCompleted)
     const todosActive = useSelector(getTodoListActive)
